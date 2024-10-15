@@ -108,9 +108,10 @@ void processa_arqv(const string& nome_arquivo)
             snippet = formatar_str(snippet);
 
             REGISTRO registro;
+            //cout<<"TAMANHO REGISTRO: "<<tamanhoRegistro()<<endl;
             try{
-                criarRegistro(registro, id, titulo, ano,autores,citacoes,atualizacao,snippet);
-                //exibirRegistro(registro);
+                criarRegistro(&registro, id, titulo, ano,autores,citacoes,atualizacao,snippet);
+                exibirRegistro(&registro);
             }
             catch(const invalid_argument& e){
                 cerr<< "ERRO AO CRIAR REGISTRO NA LINHA: " << id<< endl;

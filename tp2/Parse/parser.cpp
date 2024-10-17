@@ -5,7 +5,7 @@
 #include <fstream>
 #include <cctype>
 #include <algorithm>
-#include <../Registro/registro.hpp>
+#include "../registro/registro.hpp"
 
 using namespace std;
 
@@ -107,25 +107,14 @@ void processa_arqv(const string& nome_arquivo)
             atualizacao = formatar_str(atualizacao);
             snippet = formatar_str(snippet);
 
-            REGISTRO registro;
+            
             try{
-                criarRegistro(registro, id, titulo, ano,autores,citacoes,atualizacao,snippet);
+            Registro registro(id, titulo, ano,autores,citacoes,atualizacao,snippet);
                 //exibirRegistro(registro);
-            }
-            catch(const invalid_argument& e){
+            } catch(const invalid_argument& e){
                 cerr<< "ERRO AO CRIAR REGISTRO NA LINHA: " << id<< endl;
             }
 
-          /*   Registro* novo_registro = criar_registro(id, titulo, ano, autores, citacoes, atualizacao, snippet);
-            size_t posicao = hash.inserir_registro_bucket(novo_registro);
-
-            RegistroBPT* reg1 = new RegistroBPT(id, posicao);
-            RegistroString* reg2 = new RegistroString(titulo, posicao);
-
-            arvore1.inserir_arvore(reg1);
-            arvore2.inserir_arvore_s(reg2);
-            
-            delete novo_registro; */
         } catch (const invalid_argument& e) {
             //cout << "Erro de conversão na linha: " << id_str << endl;
             continue; // Pula para a próxima linha em caso de erro
@@ -138,10 +127,6 @@ void processa_arqv(const string& nome_arquivo)
 
     return;
 }
-
-
-
-
 int main() {
     string nome_arquivo;
 

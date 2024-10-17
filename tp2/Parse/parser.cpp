@@ -5,8 +5,7 @@
 #include <fstream>
 #include <cctype>
 #include <algorithm>
-#include "../registro/registro.hpp"
-
+#include "../Registro/registro.hpp"
 using namespace std;
 
 // Função para remover aspas em um stream de entrada

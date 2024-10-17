@@ -5,5 +5,5 @@
         "iosfwd": "cpp",
         "iostream": "cpp",
         "*.tcc": "cpp"
-    }
+    },
 }

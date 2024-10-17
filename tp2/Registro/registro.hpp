@@ -5,7 +5,7 @@
 
 using namespace std;
 
-class Registro {
+    class Registro {
  public:
   int id;
   char titulo[300]; 
@@ -36,6 +36,10 @@ class Registro {
     
     strncpy(this->snippet, snippet.c_str(), sizeof(this->snippet) - 1);
     this->snippet[sizeof(this->snippet) - 1] = '\0';  // Garantir o terminador nulo
+  }
+
+  void printId(){
+    cout << "Id: " << this->id << endl;
   }
 
   // Método print com implementação dentro da classe

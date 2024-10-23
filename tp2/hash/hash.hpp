@@ -14,9 +14,9 @@ class Hash{
     fstream &arquivo;
     
 
-    Hash(fstream &arquivo) : arquivo(arquivo) {
+    explicit Hash(fstream &arquivo) : arquivo(arquivo) {
         Bloco bloco;
-        for (int i = 0; i < 240000; i++) { //12 blocos por bucket e 20000 buckets no vetor
+        for (int i = 0; i < TAM_HASH; i++) { //12 blocos por bucket e 20000 buckets no vetor
             arquivo.write(reinterpret_cast<char*>(&bloco), TAM_BLOCO);
         }
     }
@@ -32,13 +32,13 @@ class Hash{
         hash = (hash ^ (hash >> 16));
         
         // Garante que o valor da hash seja restrito ao tamanho da tabela hash
-        return hash % 240000;
+        return hash % TAM_HASH;
     }
 
     bool insere_hash(Registro registro){
         int key = hashFunction(registro.id);
         int pos = key * (12*TAM_BLOCO);
-
+        
     }
 
     bool insertItem(Registro &registro) {
@@ -49,7 +49,7 @@ class Hash{
 
         while (cont_bloco < 12) {
             // Posiciona o ponteiro de leitura no bloco atual
-            this->arquivo.seekg(pos, std::ios::beg);
+            this->arquivo.seekg(pos, ios::beg);
             
             // Se não puder ler o bloco, retornar false
             this->arquivo.read(reinterpret_cast<char*>(&bloco), TAM_BLOCO);
@@ -60,7 +60,7 @@ class Hash{
             // Tenta inserir o registro no bloco atual
             if (bloco.inserir_registro(registro)) {
                 // Posiciona o ponteiro de escrita no bloco atual para sobrescrever
-                this->arquivo.seekp(pos, std::ios::beg);
+                this->arquivo.seekp(pos, ios::beg);
                 this->arquivo.write(reinterpret_cast<char*>(&bloco), TAM_BLOCO);
 
                 // Verifica se a escrita foi bem-sucedida
@@ -87,12 +87,12 @@ class Hash{
 
         while (cont_bloco < 12) {
             // Posiciona o ponteiro de leitura no bloco atual
-            this->arquivo.seekg(pos, std::ios::beg);
+            this->arquivo.seekg(pos, ios::beg);
             
-            // Se não puder ler o bloco, retornar std::nullopt
+            // Se não puder ler o bloco, retornar nullopt
             this->arquivo.read(reinterpret_cast<char*>(&bloco), TAM_BLOCO);
             if (!this->arquivo) {
-                return std::nullopt; // Falha ao ler o bloco
+                return nullopt; // Falha ao ler o bloco
             }
 
             // Tenta encontrar o registro no bloco atual
@@ -106,7 +106,7 @@ class Hash{
             }
         }
 
-        return std::nullopt; // Registro não encontrado
+        return nullopt; // Registro não encontrado
     }
 
 

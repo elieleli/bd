@@ -6,6 +6,8 @@ CXX = g++
 
 # Diretórios
 REGISTRO_DIR = ../Registro
+HASH_DIR = ../hash
+
 
 # Arquivos fonte
 SRC = parser.cpp

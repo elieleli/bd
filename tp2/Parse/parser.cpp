@@ -6,6 +6,8 @@
 #include <cctype>
 #include <algorithm>
 #include "../Registro/registro.hpp"
+#include "../hash/hash.hpp"
+
 using namespace std;
 
 // Função para remover aspas em um stream de entrada
@@ -42,7 +44,7 @@ string formatar_str(string str) {
     return str;
 }
 
-void processa_arqv(const string& nome_arquivo)
+void processa_arqv(const string& nome_arquivo, Hash &hash)
 {
     ifstream arquivo(nome_arquivo, ios::in);
     
@@ -109,9 +111,11 @@ void processa_arqv(const string& nome_arquivo)
             
             try{
             Registro registro(id, titulo, ano,autores,citacoes,atualizacao,snippet);
+            
                 //exibirRegistro(registro);
             } catch(const invalid_argument& e){
-                cerr<< "ERRO AO CRIAR REGISTRO NA LINHA: " << id<< endl;
+                cerr << "ERRO AO CRIAR REGISTRO NA LINHA: " << id<< endl;
+                cerr << "\nERRO: " << e.what() << endl;
             }
 
         } catch (const invalid_argument& e) {
@@ -129,9 +133,12 @@ void processa_arqv(const string& nome_arquivo)
 int main() {
     string nome_arquivo;
 
+
     // Solicitar o nome do arquivo ao usuário
     cout << "Digite o nome do arquivo CSV: ";
     cin >> nome_arquivo;
+    
+    Hash tabela();
     processa_arqv(nome_arquivo);
 
     return 0;

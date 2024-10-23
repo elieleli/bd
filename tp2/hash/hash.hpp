@@ -47,8 +47,8 @@ class Hash{
         return (hash * (12 * TAM_BLOCO)) % 240000;
     }  
 
-    bool insertItem(Registro &registro) {
-        int pos = hashFunction(registro.id);               // Calcula a chave
+    bool insertItem(Registro *registro) {
+        int pos = hashFunction(registro->id);               // Calcula a chave
         Bloco bloco;
         int cont_bloco = 0;
 
@@ -84,12 +84,12 @@ class Hash{
         return false; // Se não conseguiu inserir em nenhum dos 12 blocos do bucket
     }
 
-    optional<Registro> searchItem(int id) {
+    optional<Registro> searchItem(int id, int &blocos_lidos) {
         int pos = hashFunction(id);                         // Calcula a chave
         Bloco bloco;
-        int cont_bloco = 0;
+        blocos_lidos = 0;
 
-        while (cont_bloco < 12) {
+        while (blocos_lidos < 12) {
             // Posiciona o ponteiro de leitura no bloco atual
             this->arquivo.seekg(pos, std::ios::beg);
             
@@ -106,7 +106,7 @@ class Hash{
             } else {
                 // Passa para o próximo bloco no bucket
                 pos += TAM_BLOCO;
-                cont_bloco++;
+                blocos_lidos++;
             }
         }
 
@@ -117,7 +117,7 @@ class Hash{
 };
 
 
-int main() {
+/* int main() {
     // Abrindo o arquivo binário para leitura/escrita
     fstream arquivo("hash_test.dat", ios::in | ios::out | ios::binary);
 
@@ -141,7 +141,7 @@ int main() {
     // Instanciando a tabela hash
     Hash tabela_hash(arquivo);
 
-    /* Criando registros de exemplo
+    // Criando registros de exemplo
     Registro reg1(1, "Primeiro Artigo", 2022, "Autor1", 10, "10/10/2023", "Snippet do artigo 1");
     Registro reg2(2, "Segundo Artigo", 2023, "Autor2", 20, "11/10/2023", "Snippet do artigo 2");
 
@@ -156,7 +156,7 @@ int main() {
         cout << "Registro 2 inserido com sucesso!" << endl;
     } else {
         cout << "Falha ao inserir Registro 2." << endl;
-    }*/
+    }
 
     // Buscando os registros inseridos
     auto resultado1 = tabela_hash.searchItem(1);
@@ -177,3 +177,4 @@ int main() {
     arquivo.close();
     return 0;
 }
+ */

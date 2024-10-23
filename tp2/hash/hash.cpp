@@ -33,17 +33,11 @@ class Hash{
         
         // Garante que o valor da hash seja restrito ao tamanho da tabela hash
         return hash % 240000;
-    }
-
-    bool insere_hash(Registro registro){
-        int key = hashFunction(registro.id);
-        int pos = key * (12*TAM_BLOCO);
-
-    }
+    }  
 
     bool insertItem(Registro &registro) {
         int key = hashFunction(registro.id);               // Calcula a chave
-        int pos = key * (12 * TAM_BLOCO);                  // Calcula o offset inicial no arquivo
+        int pos = (key * (12 * TAM_BLOCO))%240000;                  // Calcula o offset inicial no arquivo
         Bloco bloco;
         int cont_bloco = 0;
 
@@ -81,7 +75,7 @@ class Hash{
 
     optional<Registro> searchItem(int id) {
         int key = hashFunction(id);                         // Calcula a chave
-        int pos = key * (12 * TAM_BLOCO);                   // Calcula o offset inicial no arquivo
+        int pos = (key * (12 * TAM_BLOCO))%240000;                   // Calcula o offset inicial no arquivo
         Bloco bloco;
         int cont_bloco = 0;
 
@@ -112,3 +106,64 @@ class Hash{
 
 };
 
+
+int main() {
+    // Abrindo o arquivo binário para leitura/escrita
+    fstream arquivo("hash_test.dat", ios::in | ios::out | ios::binary);
+
+    // Se o arquivo não existir, criar um novo
+    if (!arquivo) {
+        cout << "Arquivo não encontrado. Criando um novo arquivo..." << endl;
+        arquivo.open("hash_test.dat", ios::out | ios::binary);  // Cria o arquivo
+        if (!arquivo) {
+            cerr << "Erro ao criar o arquivo de teste." << endl;
+            return 1;
+        }
+        arquivo.close();
+        // Reabrir o arquivo em modo de leitura/escrita
+        arquivo.open("hash_test.dat", ios::in | ios::out | ios::binary);
+        if (!arquivo) {
+            cerr << "Erro ao reabrir o arquivo criado." << endl;
+            return 1;
+        }
+    }
+
+    // Instanciando a tabela hash
+    Hash tabela_hash(arquivo);
+
+    // Criando registros de exemplo
+    Registro reg1(1, "Primeiro Artigo", 2022, "Autor1", 10, "10/10/2023", "Snippet do artigo 1");
+    Registro reg2(2, "Segundo Artigo", 2023, "Autor2", 20, "11/10/2023", "Snippet do artigo 2");
+
+    // Inserindo registros na tabela hash
+    if (tabela_hash.insertItem(reg1)) {
+        cout << "Registro 1 inserido com sucesso!" << endl;
+    } else {
+        cout << "Falha ao inserir Registro 1." << endl;
+    }
+
+    if (tabela_hash.insertItem(reg2)) {
+        cout << "Registro 2 inserido com sucesso!" << endl;
+    } else {
+        cout << "Falha ao inserir Registro 2." << endl;
+    }
+
+    // Buscando os registros inseridos
+    auto resultado1 = tabela_hash.searchItem(1);
+    if (resultado1) {
+        cout << "Registro 1 encontrado: " << resultado1->titulo << endl;
+    } else {
+        cout << "Registro 1 não encontrado." << endl;
+    }
+
+    auto resultado2 = tabela_hash.searchItem(2);
+    if (resultado2) {
+        cout << "Registro 2 encontrado: " << resultado2->titulo << endl;
+    } else {
+        cout << "Registro 2 não encontrado." << endl;
+    }
+
+    // Fechando o arquivo
+    arquivo.close();
+    return 0;
+}

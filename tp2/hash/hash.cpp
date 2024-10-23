@@ -15,10 +15,22 @@ class Hash{
     
 
     Hash(fstream &arquivo) : arquivo(arquivo) {
-        Bloco bloco;
-        for (int i = 0; i < 240000; i++) { //12 blocos por bucket e 20000 buckets no vetor
-            arquivo.write(reinterpret_cast<char*>(&bloco), TAM_BLOCO);
+        // Posiciona o ponteiro no final para verificar o tamanho do arquivo
+        arquivo.seekg(0, ios::end);
+        streampos tamanho_arquivo = arquivo.tellg();
+        
+        // Se o arquivo estiver vazio, popula com blocos
+        if (tamanho_arquivo == 0) {
+            Bloco bloco;
+            for (int i = 0; i < 240000; i++) { //12 blocos por bucket e 20000 buckets no vetor
+                arquivo.write(reinterpret_cast<char*>(&bloco), TAM_BLOCO);
+            }
+        } else {
+            cout << "Arquivo já populado. Tamanho: " << tamanho_arquivo << " bytes." << endl;
         }
+        
+        // Retorna o ponteiro ao início do arquivo
+        arquivo.seekg(0, ios::beg);
     }
 
     // Função de hash que recebe um inteiro e retorna uma chave hash única
@@ -73,8 +85,7 @@ class Hash{
     }
 
     optional<Registro> searchItem(int id) {
-        int key = hashFunction(id);                         // Calcula a chave
-        int pos = (key * (12 * TAM_BLOCO))%240000;                   // Calcula o offset inicial no arquivo
+        int pos = hashFunction(id);                         // Calcula a chave
         Bloco bloco;
         int cont_bloco = 0;
 
@@ -130,7 +141,7 @@ int main() {
     // Instanciando a tabela hash
     Hash tabela_hash(arquivo);
 
-    // Criando registros de exemplo
+    /* Criando registros de exemplo
     Registro reg1(1, "Primeiro Artigo", 2022, "Autor1", 10, "10/10/2023", "Snippet do artigo 1");
     Registro reg2(2, "Segundo Artigo", 2023, "Autor2", 20, "11/10/2023", "Snippet do artigo 2");
 
@@ -145,7 +156,7 @@ int main() {
         cout << "Registro 2 inserido com sucesso!" << endl;
     } else {
         cout << "Falha ao inserir Registro 2." << endl;
-    }
+    }*/
 
     // Buscando os registros inseridos
     auto resultado1 = tabela_hash.searchItem(1);

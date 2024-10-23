@@ -6,6 +6,8 @@
 #include <cctype>
 #include <algorithm>
 #include "../Registro/registro.hpp"
+#include "../hash/hash.hpp"
+
 using namespace std;
 
 // Função para remover aspas em um stream de entrada
@@ -42,16 +44,9 @@ string formatar_str(string str) {
     return str;
 }
 
-void processa_arqv(const string& nome_arquivo)
+void processa_arqv(ifstream &arquivo, Hash &hash)
 {
-    ifstream arquivo(nome_arquivo, ios::in);
-    
-    if (!arquivo.is_open())
-    {
-        cerr << "Nao foi possivel abrir o arquivo: " << nome_arquivo << "\n";
-        return;
-    }
-    int id_str =0 ;
+    int id_str = 0 ;
 
     string linha;
     while (getline(arquivo, linha))
@@ -108,8 +103,9 @@ void processa_arqv(const string& nome_arquivo)
 
             
             try{
-            Registro registro(id, titulo, ano,autores,citacoes,atualizacao,snippet);
-                //exibirRegistro(registro);
+            Registro *registro = new Registro(id, titulo, ano,autores,citacoes,atualizacao,snippet);
+
+            hash.insertItem(registro);
             } catch(const invalid_argument& e){
                 cerr<< "ERRO AO CRIAR REGISTRO NA LINHA: " << id<< endl;
             }
@@ -126,13 +122,14 @@ void processa_arqv(const string& nome_arquivo)
 
     return;
 }
-int main() {
-    string nome_arquivo;
 
-    // Solicitar o nome do arquivo ao usuário
-    cout << "Digite o nome do arquivo CSV: ";
-    cin >> nome_arquivo;
-    processa_arqv(nome_arquivo);
+
+int main() {
+    ifstream arquivo("sample_parse.csv");
+    fstream arquivo_hash("hash.bin", ios::binary | ios::out);
+    Hash hash(arquivo_hash);
+
+    processa_arqv(arquivo, hash);
 
     return 0;
 }

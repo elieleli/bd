@@ -44,7 +44,7 @@ string formatar_str(string str) {
     return str;
 }
 
-void processa_arqv(const string& nome_arquivo, Hash &hash)
+void processa_arqv(const string& nome_arquivo)
 {
     ifstream arquivo(nome_arquivo, ios::in);
     

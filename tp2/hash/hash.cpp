@@ -32,12 +32,11 @@ class Hash{
         hash = (hash ^ (hash >> 16));
         
         // Garante que o valor da hash seja restrito ao tamanho da tabela hash
-        return hash % 240000;
+        return (hash * (12 * TAM_BLOCO)) % 240000;
     }  
 
     bool insertItem(Registro &registro) {
-        int key = hashFunction(registro.id);               // Calcula a chave
-        int pos = (key * (12 * TAM_BLOCO))%240000;                  // Calcula o offset inicial no arquivo
+        int pos = hashFunction(registro.id);               // Calcula a chave
         Bloco bloco;
         int cont_bloco = 0;
 
@@ -135,7 +134,7 @@ int main() {
     Registro reg1(1, "Primeiro Artigo", 2022, "Autor1", 10, "10/10/2023", "Snippet do artigo 1");
     Registro reg2(2, "Segundo Artigo", 2023, "Autor2", 20, "11/10/2023", "Snippet do artigo 2");
 
-    // Inserindo registros na tabela hash
+    //Inserindo registros na tabela hash
     if (tabela_hash.insertItem(reg1)) {
         cout << "Registro 1 inserido com sucesso!" << endl;
     } else {

@@ -14,12 +14,23 @@ class Hash{
     fstream &arquivo;
     
 
-    explicit Hash(fstream &arquivo) : arquivo(arquivo) {
-        Bloco bloco;
-        for (int i = 0; i < 10; i++) { //12 blocos por bucket e 20000 buckets no vetor
-            arquivo.write(reinterpret_cast<char*>(&bloco), TAM_BLOCO);
-            if(!arquivo){cerr << "ERRO AO ESCREVER O BLOCO" << endl; break;}
+    Hash(fstream &arquivo) : arquivo(arquivo) {
+        // Posiciona o ponteiro no final para verificar o tamanho do arquivo
+        arquivo.seekg(0, ios::end);
+        streampos tamanho_arquivo = arquivo.tellg();
+        
+        // Se o arquivo estiver vazio, popula com blocos
+        if (tamanho_arquivo == 0) {
+            Bloco bloco;
+            for (int i = 0; i < 240000; i++) { //12 blocos por bucket e 20000 buckets no vetor
+                arquivo.write(reinterpret_cast<char*>(&bloco), TAM_BLOCO);
+            }
+        } else {
+            cout << "Arquivo já populado. Tamanho: " << tamanho_arquivo << " bytes." << endl;
         }
+        
+        // Retorna o ponteiro ao início do arquivo
+        arquivo.seekg(0, ios::beg);
     }
 
     // Função de hash que recebe um inteiro e retorna uma chave hash única
@@ -33,16 +44,11 @@ class Hash{
         hash = (hash ^ (hash >> 16));
         
         // Garante que o valor da hash seja restrito ao tamanho da tabela hash
-        return hash % 10;
-    }
-
+        return (hash * (12 * TAM_BLOCO)) % 240000;
+    }  
 
     bool insertItem(Registro &registro) {
-        cout << "ENTREI NA FUNCAO" << endl;
-        int key = hashFunction(registro.id);               // Calcula a chave
-        cout << "CALCULEI A CHAVE HASH" << endl;
-        int pos = key * (12 * TAM_BLOCO);                  // Calcula o offset inicial no arquivo
-        cout << "ACHEI A POSICAO" << endl;
+        int pos = hashFunction(registro.id);               // Calcula a chave
         Bloco bloco;
         cout << "INSTANCIA DO BLOCO" << endl;
         int cont_bloco = 0;
@@ -93,8 +99,7 @@ class Hash{
     }
 
     optional<Registro> searchItem(int id) {
-        int key = hashFunction(id);                         // Calcula a chave
-        int pos = key * (12 * TAM_BLOCO);                   // Calcula o offset inicial no arquivo
+        int pos = hashFunction(id);                         // Calcula a chave
         Bloco bloco;
         int cont_bloco = 0;
 
@@ -125,3 +130,64 @@ class Hash{
 
 };
 
+
+int main() {
+    // Abrindo o arquivo binário para leitura/escrita
+    fstream arquivo("hash_test.dat", ios::in | ios::out | ios::binary);
+
+    // Se o arquivo não existir, criar um novo
+    if (!arquivo) {
+        cout << "Arquivo não encontrado. Criando um novo arquivo..." << endl;
+        arquivo.open("hash_test.dat", ios::out | ios::binary);  // Cria o arquivo
+        if (!arquivo) {
+            cerr << "Erro ao criar o arquivo de teste." << endl;
+            return 1;
+        }
+        arquivo.close();
+        // Reabrir o arquivo em modo de leitura/escrita
+        arquivo.open("hash_test.dat", ios::in | ios::out | ios::binary);
+        if (!arquivo) {
+            cerr << "Erro ao reabrir o arquivo criado." << endl;
+            return 1;
+        }
+    }
+
+    // Instanciando a tabela hash
+    Hash tabela_hash(arquivo);
+
+    /* Criando registros de exemplo
+    Registro reg1(1, "Primeiro Artigo", 2022, "Autor1", 10, "10/10/2023", "Snippet do artigo 1");
+    Registro reg2(2, "Segundo Artigo", 2023, "Autor2", 20, "11/10/2023", "Snippet do artigo 2");
+
+    //Inserindo registros na tabela hash
+    if (tabela_hash.insertItem(reg1)) {
+        cout << "Registro 1 inserido com sucesso!" << endl;
+    } else {
+        cout << "Falha ao inserir Registro 1." << endl;
+    }
+
+    if (tabela_hash.insertItem(reg2)) {
+        cout << "Registro 2 inserido com sucesso!" << endl;
+    } else {
+        cout << "Falha ao inserir Registro 2." << endl;
+    }*/
+
+    // Buscando os registros inseridos
+    auto resultado1 = tabela_hash.searchItem(1);
+    if (resultado1) {
+        cout << "Registro 1 encontrado: " << resultado1->titulo << endl;
+    } else {
+        cout << "Registro 1 não encontrado." << endl;
+    }
+
+    auto resultado2 = tabela_hash.searchItem(2);
+    if (resultado2) {
+        cout << "Registro 2 encontrado: " << resultado2->titulo << endl;
+    } else {
+        cout << "Registro 2 não encontrado." << endl;
+    }
+
+    // Fechando o arquivo
+    arquivo.close();
+    return 0;
+}

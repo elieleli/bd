@@ -13,7 +13,7 @@ class Bloco{
   public:
     int registros;
     char dados[TAM_BLOCO];
-    
+
     Bloco(){
       this->registros = 0;
       for(int i=0; i<TAM_BLOCO; i++){

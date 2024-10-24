@@ -21,15 +21,15 @@ class Bloco{
       }
     }
 
-    bool inserir_registro(Registro *registro){
+    bool inserir_registro(Registro registro){
       if(this->registros == 2){
         return false;
       }
       if(this->registros == 0){
-        memcpy(&(this->dados[0]), registro, TAM_REG);
+        memcpy(&(this->dados[0]), &registro, TAM_REG);
       }
       else{
-        memcpy(&(this->dados[TAM_REG]), registro, TAM_REG);
+        memcpy(&(this->dados[TAM_REG]), &registro, TAM_REG);
       }
 
       this->registros++;

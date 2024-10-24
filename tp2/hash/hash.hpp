@@ -22,7 +22,7 @@ class Hash{
         // Se o arquivo estiver vazio, popula com blocos
         if (tamanho_arquivo == 0) {
             Bloco bloco;
-            for (int i = 0; i < 240000; i++) { //12 blocos por bucket e 20000 buckets no vetor
+            for (int i = 0; i < 12; i++) { //12 blocos por bucket e 20000 buckets no vetor
                 arquivo.write(reinterpret_cast<char*>(&bloco), TAM_BLOCO);
             }
         } else {
@@ -44,7 +44,7 @@ class Hash{
         hash = (hash ^ (hash >> 16));
         
         // Garante que o valor da hash seja restrito ao tamanho da tabela hash
-        return (hash * (12 * TAM_BLOCO)) % 240000;
+        return (hash * (12 * TAM_BLOCO)) % 12;
     }  
 
     bool insertItem(Registro *registro) {
@@ -63,7 +63,7 @@ class Hash{
             }
 
             // Tenta inserir o registro no bloco atual
-            if (bloco.inserir_registro(registro)) {
+            if (bloco.inserir_registro(*registro)) {
                 // Posiciona o ponteiro de escrita no bloco atual para sobrescrever
                 this->arquivo.seekp(pos, std::ios::beg);
                 this->arquivo.write(reinterpret_cast<char*>(&bloco), TAM_BLOCO);
@@ -102,6 +102,7 @@ class Hash{
             // Tenta encontrar o registro no bloco atual
             Registro* registro_encontrado = bloco.buscar_registro(id);
             if (registro_encontrado) {
+                registro_encontrado->print();
                 return *registro_encontrado; // Retorna o registro encontrado
             } else {
                 // Passa para o próximo bloco no bucket

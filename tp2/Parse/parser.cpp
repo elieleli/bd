@@ -125,11 +125,11 @@ void processa_arqv(ifstream &arquivo, Hash &hash)
 
 
 int main() {
-    ifstream arquivo("sample_parse.csv");
-    fstream arquivo_hash("hash.bin", ios::binary | ios::out);
+    // ifstream arquivo("sample_parse.csv");
+    fstream arquivo_hash(CAMINHO_HASH, ios::binary | ios::out);
     Hash hash(arquivo_hash);
 
-    processa_arqv(arquivo, hash);
+    // processa_arqv(arquivo, hash);
 
     return 0;
 }

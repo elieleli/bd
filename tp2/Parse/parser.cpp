@@ -5,8 +5,8 @@
 #include <fstream>
 #include <cctype>
 #include <algorithm>
-#include <../Registro/registro.hpp>
-
+#include "../Registro/registro.hpp"
+#include "../hash/hash.hpp"
 using namespace std;
 
 // Função para remover aspas em um stream de entrada
@@ -46,13 +46,34 @@ string formatar_str(string str) {
 void processa_arqv(const string& nome_arquivo)
 {
     ifstream arquivo(nome_arquivo, ios::in);
+
+    // Abrindo o arquivo binário para leitura/escrita
+    fstream file("hash_test.dat", ios::in | ios::out | ios::binary);
+
+    // Se o file não existir, criar um novo
+    if (!file) {
+        cout << "file não encontrado. Criando um novo file..." << endl;
+        file.open("hash_test.dat", ios::out | ios::binary);  // Cria o file
+        if (!file) {
+            cerr << "Erro ao criar o file de teste." << endl;
+            return;
+        }
+        file.close();
+        // Reabrir o file em modo de leitura/escrita
+        file.open("hash_test.dat", ios::in | ios::out | ios::binary);
+        if (!file) {
+            cerr << "Erro ao reabrir o file criado." << endl;
+            return;
+        }
+    }
+    Hash tabela_hash(file);
     
     if (!arquivo.is_open())
     {
         cerr << "Nao foi possivel abrir o arquivo: " << nome_arquivo << "\n";
         return;
     }
-    int id_str =0 ;
+    int id_str = 0;
 
     string linha;
     while (getline(arquivo, linha))
@@ -107,40 +128,26 @@ void processa_arqv(const string& nome_arquivo)
             atualizacao = formatar_str(atualizacao);
             snippet = formatar_str(snippet);
 
-            REGISTRO registro;
             try{
-                criarRegistro(registro, id, titulo, ano,autores,citacoes,atualizacao,snippet);
-                //exibirRegistro(registro);
+                Registro registro(id, titulo, ano, autores, citacoes, atualizacao, snippet);
+                if(!tabela_hash.insertItem(registro)){
+                    return;
+                };
+            } catch(const invalid_argument& e){
+                cerr << "ERRO AO CRIAR REGISTRO NA LINHA: " << id << endl;
             }
-            catch(const invalid_argument& e){
-                cerr<< "ERRO AO CRIAR REGISTRO NA LINHA: " << id<< endl;
-            }
 
-          /*   Registro* novo_registro = criar_registro(id, titulo, ano, autores, citacoes, atualizacao, snippet);
-            size_t posicao = hash.inserir_registro_bucket(novo_registro);
-
-            RegistroBPT* reg1 = new RegistroBPT(id, posicao);
-            RegistroString* reg2 = new RegistroString(titulo, posicao);
-
-            arvore1.inserir_arvore(reg1);
-            arvore2.inserir_arvore_s(reg2);
-            
-            delete novo_registro; */
         } catch (const invalid_argument& e) {
-            //cout << "Erro de conversão na linha: " << id_str << endl;
             continue; // Pula para a próxima linha em caso de erro
         } catch (const out_of_range& e) {
-            //cout << "Valor fora do intervalo na linha: " << id_str << endl;
             continue;
         }
     }
     arquivo.close();
+    file.close();
 
     return;
 }
-
-
-
 
 int main() {
     string nome_arquivo;
@@ -149,6 +156,34 @@ int main() {
     cout << "Digite o nome do arquivo CSV: ";
     cin >> nome_arquivo;
     processa_arqv(nome_arquivo);
+
+    // Reabrindo o arquivo para operações de busca
+    fstream file("hash_test.dat", ios::in | ios::out | ios::binary);
+    if (!file) {
+        cerr << "Erro ao reabrir o file para leitura." << endl;
+        return 1;
+    }
+
+    // Instanciando a tabela hash novamente para buscar os registros
+    Hash tabela_hash1(file);
+
+    // Buscando os registros inseridos
+    auto resultado1 = tabela_hash1.searchItem(1);
+    if (resultado1) {
+        cout << "Registro 1 encontrado: " << resultado1->titulo << endl;
+    } else {
+        cout << "Registro 1 não encontrado." << endl;
+    }
+
+    auto resultado2 = tabela_hash1.searchItem(2);
+    if (resultado2) {
+        cout << "Registro 2 encontrado: " << resultado2->titulo << endl;
+    } else {
+        cout << "Registro 2 não encontrado." << endl;
+    }
+
+    // Fechando o file no final do programa
+    file.close();
 
     return 0;
 }

@@ -209,9 +209,11 @@ def reservaAssentoVersaoA(con: connection) -> int:
     except psycopg2.DatabaseError as db_error:
         con.rollback()
         logging.error(f"Erro ao realizar a reserva: {db_error}")
+        return None
     except Exception as error:
         con.rollback()
         logging.error(f"Erro inesperado durante o processo de reserva: {error}")
+        return None
     finally:
         return tentativas
 

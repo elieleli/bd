@@ -278,7 +278,7 @@ def reservaAssentoThread(con: connection, thread_id: int, versao: str) -> int:
         if versao == "A":
             tentativas = reservaAssentoVersaoA(con)
         elif versao == "B":
-            tentativas = reservaAssentoVersaoA(con)
+            tentativas = reservaAssentoVersaoB(con)
         else:
             logging.error(f"[Thread {thread_id}] Versão inválida para a reserva: {versao}")
             return tentativas  # Retorna 0 se versão inválida
